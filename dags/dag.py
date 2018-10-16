@@ -52,3 +52,5 @@ dataproc_delete_cluster = DataprocClusterDeleteOperator(
     trigger_rule=TriggerRule.ALL_DONE,
     dag=dag,
 )
+
+dataproc_create_cluster >> compute_aggregates >> dataproc_delete_cluster
