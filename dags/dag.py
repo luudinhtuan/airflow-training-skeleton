@@ -2,10 +2,9 @@ import datetime as dt
 
 from airflow import DAG
 from airflow.operators.python_operator import PythonOperator
-from godatadriven.operators.postgres_to_gcs import PostgresToGoogleCloudStorageOperator
 
 dag = DAG(
-    dag_id="ukland",
+    dag_id="mydag",
     schedule_interval="30 7 * * *",
     default_args={
         "owner": "airflow",
@@ -15,12 +14,13 @@ dag = DAG(
         "email": "airflow_errors@myorganisation.com",
     },
 )
+def print_exec_date(**context):
+    print(context["execution_date"])
 
-pg_2_gcs = PostgresToGoogleCloudStorageOperator(
-    task_id='pg_2_gcs',
-    postgres_conn_id='pgairflow',
-    sql='SELECT COUNT(*) FROM land_registry_price_paid_uk',
-    bucket='gs://tuanairflow/',
-    filename='landuk',
-    dag=dag
+
+my_task = PythonOperator(
+    task_id="task_mydag", python_callable=print_exec_date, provide_context=True, dag=dag
 )
+
+
+
