@@ -47,7 +47,7 @@ compute_aggregates = DataProcPySparkOperator(
 )
 
 compute_aggregates_next = DataProcPySparkOperator(
-    task_id='compute_aggregates',
+    task_id='compute_aggregates_next',
     main='gs://europe-west1-training-airfl-4c5b98dd-bucket/dags/other/build_statistics_simple_next.py',
     cluster_name='analyse-pricing-{{ ds }}',
     arguments=["{{ ds }}"],
@@ -55,7 +55,7 @@ compute_aggregates_next = DataProcPySparkOperator(
 )
 
 compute_aggregates_con = DataProcPySparkOperator(
-    task_id='compute_aggregates',
+    task_id='compute_aggregates_con',
     main='gs://europe-west1-training-airfl-4c5b98dd-bucket/dags/other/build_statistics_simple_con.py',
     cluster_name='analyse-pricing-{{ ds }}',
     arguments=["{{ ds }}"],
@@ -71,4 +71,5 @@ dataproc_delete_cluster = DataprocClusterDeleteOperator(
 )
 
 dataproc_create_cluster >> compute_aggregates >> compute_aggregates_next >>dataproc_delete_cluster
+
 dataproc_create_cluster >> compute_aggregates_con >> dataproc_delete_cluster
