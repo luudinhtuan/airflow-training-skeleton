@@ -8,6 +8,7 @@ from airflow.contrib.operators.dataproc_operator import (
     DataprocClusterDeleteOperator
 )
 from airflow.utils.trigger_rule import TriggerRule
+from airflow.contrib.operators.gcs_to_bq import GoogleCloudStorageToBigQueryOperator
 
 dag = DAG(
     dag_id="mydag",
@@ -45,6 +46,22 @@ compute_aggregates = DataProcPySparkOperator(
     dag=dag,
 )
 
+compute_aggregates_next = DataProcPySparkOperator(
+    task_id='compute_aggregates',
+    main='gs://europe-west1-training-airfl-4c5b98dd-bucket/dags/other/build_statistics_simple_next.py',
+    cluster_name='analyse-pricing-{{ ds }}',
+    arguments=["{{ ds }}"],
+    dag=dag,
+)
+
+compute_aggregates_con = DataProcPySparkOperator(
+    task_id='compute_aggregates',
+    main='gs://europe-west1-training-airfl-4c5b98dd-bucket/dags/other/build_statistics_simple_con.py',
+    cluster_name='analyse-pricing-{{ ds }}',
+    arguments=["{{ ds }}"],
+    dag=dag,
+)
+
 dataproc_delete_cluster = DataprocClusterDeleteOperator(
     task_id="delete_dataproc",
     cluster_name="analyse-pricing-{{ ds }}",
@@ -53,5 +70,5 @@ dataproc_delete_cluster = DataprocClusterDeleteOperator(
     dag=dag,
 )
 
-dataproc_create_cluster >> compute_aggregates >> dataproc_delete_cluster
-
+dataproc_create_cluster >> compute_aggregates >> compute_aggregates_next >>dataproc_delete_cluster
+dataproc_create_cluster >> compute_aggregates_con >> dataproc_delete_cluster
