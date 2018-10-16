@@ -19,7 +19,7 @@ dag = DAG(
 )
 
 pg_2_gcs = PostgresToGoogleCloudStorageOperator(
-    task_id = 'pg_2_gcs',
+    task_id='pg_2_gcs',
     postgres_conn_id='pgairflow',
     sql='SELECT COUNT(*) FROM gdd.land_registry_price_paid_uk',
     bucket='gs://tuanairflow/',
