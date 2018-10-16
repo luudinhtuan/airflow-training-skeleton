@@ -31,5 +31,5 @@ def print_exec_date(**context):
 
 
 my_task = PythonOperator(
-    task_id="task_name", python_callable=print_exec_date, provide_context=True, dag=dag
+    task_id="pg_2_gcs", python_callable=print_exec_date, provide_context=True, dag=dag
 )
