@@ -8,4 +8,4 @@ steps:
   entrypoint: 'bash'
 - id: 'upload'
   name: 'gcr.io/cloud-builders/gsutil'
-  args: ['-m', 'rsync', '-r', '.', 'gs://europe-west1-training-airfl-c76f98ca-bucket/']
+  args: ['-m', 'rsync', '-r', '.', 'gs://tuanairflow/']
