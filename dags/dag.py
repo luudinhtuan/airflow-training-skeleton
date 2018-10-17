@@ -98,7 +98,7 @@ default_args = {
 
 load_into_bigquery = DataFlowPythonOperator(
     task_id='load_2_bq',
-    dataflow_default_options=None,
+    dataflow_default_options={'project':'airflowbolcom-d0bcb1627a89fedd'},
     py_file='gs://europe-west1-training-airfl-4c5b98dd-bucket/dags/other/dataflow_job.py',
     dag=dag,
 )
