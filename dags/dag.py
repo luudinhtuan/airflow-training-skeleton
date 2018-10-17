@@ -2,6 +2,11 @@ import datetime as dt
 
 from airflow import DAG
 from airflow.operators.python_operator import PythonOperator
+from airflow.hooks.http_hook import HttpHook
+from airflow.models import BaseOperator
+from airflow.utils.decorators import apply_defaults
+from airflow.contrib.hooks.gcs_hook import GoogleCloudStorageHook
+
 from airflow.contrib.operators.dataproc_operator import (
     DataprocClusterCreateOperator,
     DataProcPySparkOperator,
@@ -29,47 +34,59 @@ my_task = PythonOperator(
     task_id="task_mydag", python_callable=print_exec_date, provide_context=True, dag=dag
 )
 
-dataproc_create_cluster = DataprocClusterCreateOperator(
-    task_id="create_dataproc",
-    cluster_name="analyse-pricing-{{ ds }}",
-    project_id='airflowbolcom-d0bcb1627a89fedd',
-    num_workers=2,
-    zone="europe-west4-a",
-    dag=dag,
-)
+class HttpToGcsOperator(BaseOperator):
+    template_fields = (...)
+    template_ext = ()
 
-compute_aggregates = DataProcPySparkOperator(
-    task_id='compute_aggregates',
-    main='gs://europe-west1-training-airfl-4c5b98dd-bucket/dags/other/build_statistics_simple.py',
-    cluster_name='analyse-pricing-{{ ds }}',
-    arguments=["{{ ds }}"],
-    dag=dag,
-)
+    @apply_defaults
+    def __init__(self,* args, **kwargs):
+        super(HttpToGcsOperator, self).__init__(*args, **kwargs)
 
-compute_aggregates_next = DataProcPySparkOperator(
-    task_id='compute_aggregates_next',
-    main='gs://europe-west1-training-airfl-4c5b98dd-bucket/dags/other/build_statistics_simple_next.py',
-    cluster_name='analyse-pricing-{{ ds }}',
-    arguments=["{{ ds }}"],
-    dag=dag,
-)
+    def execute(self, context):
+        print(context)
 
-compute_aggregates_con = DataProcPySparkOperator(
-    task_id='compute_aggregates_con',
-    main='gs://europe-west1-training-airfl-4c5b98dd-bucket/dags/other/build_statistics_simple_con.py',
-    cluster_name='analyse-pricing-{{ ds }}',
-    arguments=["{{ ds }}"],
-    dag=dag,
-)
 
-dataproc_delete_cluster = DataprocClusterDeleteOperator(
-    task_id="delete_dataproc",
-    cluster_name="analyse-pricing-{{ ds }}",
-    project_id='airflowbolcom-d0bcb1627a89fedd',
-    trigger_rule=TriggerRule.ALL_DONE,
-    dag=dag,
-)
-
-dataproc_create_cluster >> compute_aggregates >> compute_aggregates_next >>dataproc_delete_cluster
-
-dataproc_create_cluster >> compute_aggregates_con >> dataproc_delete_cluster
+# dataproc_create_cluster = DataprocClusterCreateOperator(
+#     task_id="create_dataproc",
+#     cluster_name="analyse-pricing-{{ ds }}",
+#     project_id='airflowbolcom-d0bcb1627a89fedd',
+#     num_workers=2,
+#     zone="europe-west4-a",
+#     dag=dag,
+# )
+#
+# compute_aggregates = DataProcPySparkOperator(
+#     task_id='compute_aggregates',
+#     main='gs://europe-west1-training-airfl-4c5b98dd-bucket/dags/other/build_statistics_simple.py',
+#     cluster_name='analyse-pricing-{{ ds }}',
+#     arguments=["{{ ds }}"],
+#     dag=dag,
+# )
+#
+# compute_aggregates_next = DataProcPySparkOperator(
+#     task_id='compute_aggregates_next',
+#     main='gs://europe-west1-training-airfl-4c5b98dd-bucket/dags/other/build_statistics_simple_next.py',
+#     cluster_name='analyse-pricing-{{ ds }}',
+#     arguments=["{{ ds }}"],
+#     dag=dag,
+# )
+#
+# compute_aggregates_con = DataProcPySparkOperator(
+#     task_id='compute_aggregates_con',
+#     main='gs://europe-west1-training-airfl-4c5b98dd-bucket/dags/other/build_statistics_simple_con.py',
+#     cluster_name='analyse-pricing-{{ ds }}',
+#     arguments=["{{ ds }}"],
+#     dag=dag,
+# )
+#
+# dataproc_delete_cluster = DataprocClusterDeleteOperator(
+#     task_id="delete_dataproc",
+#     cluster_name="analyse-pricing-{{ ds }}",
+#     project_id='airflowbolcom-d0bcb1627a89fedd',
+#     trigger_rule=TriggerRule.ALL_DONE,
+#     dag=dag,
+# )
+#
+# dataproc_create_cluster >> compute_aggregates >> compute_aggregates_next >>dataproc_delete_cluster
+#
+# dataproc_create_cluster >> compute_aggregates_con >> dataproc_delete_cluster
