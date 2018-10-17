@@ -37,7 +37,7 @@ my_task = PythonOperator(
 )
 
 
-dag.add_task(user_operator.HttpToGcsOperator())
+dag.add_task(user_operator.HttpToGcsOperator)
 
 
 
