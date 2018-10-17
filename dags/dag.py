@@ -12,8 +12,10 @@ from airflow.contrib.operators.dataproc_operator import (
     DataProcPySparkOperator,
     DataprocClusterDeleteOperator
 )
+
 from airflow.utils.trigger_rule import TriggerRule
 from airflow.contrib.operators.gcs_to_bq import GoogleCloudStorageToBigQueryOperator
+from operators import user_operator
 
 dag = DAG(
     dag_id="mydag",
@@ -34,16 +36,9 @@ my_task = PythonOperator(
     task_id="task_mydag", python_callable=print_exec_date, provide_context=True, dag=dag
 )
 
-class HttpToGcsOperator(BaseOperator):
-    template_fields = (...)
-    template_ext = ()
 
-    @apply_defaults
-    def __init__(self,* args, **kwargs):
-        super(HttpToGcsOperator, self).__init__(*args, **kwargs)
+dag.add_task(user_operator.HttpToGcsOperator())
 
-    def execute(self, context):
-        print(context)
 
 
 # dataproc_create_cluster = DataprocClusterCreateOperator(
