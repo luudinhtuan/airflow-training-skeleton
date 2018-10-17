@@ -15,6 +15,9 @@ from airflow.contrib.operators.dataproc_operator import (
 
 from airflow.utils.trigger_rule import TriggerRule
 from airflow.contrib.operators.gcs_to_bq import GoogleCloudStorageToBigQueryOperator
+from airflow.contrib.operators.dataflow_operator import DataFlowPythonOperator
+
+
 from operators import user_operator
 
 dag = DAG(
@@ -44,7 +47,6 @@ default_args = {
             "email": "airflow_errors@myorganisation.com",
         }
 
-dag.add_task(user_operator.HttpToGcsOperator(default_args))
 
 
 
@@ -92,3 +94,11 @@ dag.add_task(user_operator.HttpToGcsOperator(default_args))
 # dataproc_create_cluster >> compute_aggregates >> compute_aggregates_next >>dataproc_delete_cluster
 #
 # dataproc_create_cluster >> compute_aggregates_con >> dataproc_delete_cluster
+
+
+load_into_bigquery = DataFlowPythonOperator(
+    task_id='load_2_bq',
+    dataflow_default_options=None,
+    py_file='gs://europe-west1-training-airfl-4c5b98dd-bucket/dags/other/dataflow_job.py',
+    dag=dag,
+)
