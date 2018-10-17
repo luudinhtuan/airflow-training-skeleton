@@ -36,8 +36,15 @@ my_task = PythonOperator(
     task_id="task_mydag", python_callable=print_exec_date, provide_context=True, dag=dag
 )
 
+default_args = {
+            "owner": "airflow",
+            "start_date": dt.datetime(2018, 10, 1),
+            "depends_on_past": True,
+            "email_on_failure": True,
+            "email": "airflow_errors@myorganisation.com",
+        }
 
-dag.add_task(user_operator.HttpToGcsOperator())
+dag.add_task(user_operator.HttpToGcsOperator(default_args))
 
 
 

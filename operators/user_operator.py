@@ -9,14 +9,7 @@ class HttpToGcsOperator(BaseOperator):
 
 
     @apply_defaults
-    def __init__(self):
-        default_args = {
-            "owner": "airflow",
-            "start_date": dt.datetime(2018, 10, 1),
-            "depends_on_past": True,
-            "email_on_failure": True,
-            "email": "airflow_errors@myorganisation.com",
-        }
+    def __init__(self, default_args):
         super(HttpToGcsOperator, self).__init__( default_args=default_args)
 
     def execute(self, context):
