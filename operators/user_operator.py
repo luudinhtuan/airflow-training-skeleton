@@ -1,5 +1,5 @@
 
-
+import datetime as dt
 from airflow.hooks.http_hook import HttpHook
 from airflow.models import BaseOperator
 from airflow.utils.decorators import apply_defaults
@@ -7,9 +7,17 @@ from airflow.utils.decorators import apply_defaults
 
 class HttpToGcsOperator(BaseOperator):
 
+
     @apply_defaults
     def __init__(self):
-        super(HttpToGcsOperator, self).__init__()
+        default_args = {
+            "owner": "airflow",
+            "start_date": dt.datetime(2018, 10, 1),
+            "depends_on_past": True,
+            "email_on_failure": True,
+            "email": "airflow_errors@myorganisation.com",
+        }
+        super(HttpToGcsOperator, self).__init__( default_args=default_args)
 
     def execute(self, context):
         print("abc")
